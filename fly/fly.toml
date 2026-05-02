@@ -1,0 +1,51 @@
+# Fly.io configuration for agno-dcp-demo.
+#
+# Deploys the demo at https://demo.dcp-ai.org with:
+#   - 1 GB persistent volume mounted at /app/data (audit chain + keys)
+#   - Auto-stop when idle (free tier friendly)
+#   - HTTPS forced via Fly's managed cert
+#
+# First-time setup:
+#   fly launch --copy-config --no-deploy --name agno-dcp-demo
+#   fly volumes create agno_dcp_data --size 1 --region scl
+#   fly certs add demo.dcp-ai.org
+#   fly deploy
+
+app = "agno-dcp-demo"
+primary_region = "scl"  # Santiago de Chile; closest to demo audience
+
+[build]
+  dockerfile = "../docker/Dockerfile"
+
+[env]
+  APP_HOST = "0.0.0.0"
+  APP_PORT = "8000"
+  APP_LOG_LEVEL = "INFO"
+  DCP_DB_PATH = "/app/data/agent.db"
+  DEMO_BANK_NAME = "Demo Trust Bank"
+  DEMO_HUMAN_PRINCIPAL = "ops@demo-trust-bank.example"
+  LLM_PROVIDER = "mock"
+
+[[mounts]]
+  source = "agno_dcp_data"
+  destination = "/app/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  cpus = 1

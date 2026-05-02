@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col">
+
+  <!-- ─── HEADER ─────────────────────────────────────────────── -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <div class="text-sm font-semibold tracking-tight">{{ settings.demo_bank_name }}</div>
+          <div class="text-xs text-slate-400 font-mono">agno-dcp v0.1.0 · DCP-AI v2.8.1</div>
+        </div>
+      </div>
+      <div class="hidden sm:flex items-center gap-3 text-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Agent online
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-300 border border-brand-500/20 font-medium font-mono">
+          tier-3 · hybrid PQ
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-medium">
+          strict mode
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── HERO STRIP ────────────────────────────────────────── -->
+  <div class="border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono text-brand-300 bg-brand-500/10 border border-brand-500/20 rounded-full px-3 py-1 mb-3">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+            LIVE DEMO · Banking collections workflow
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
+            Cryptographic governance for an Agno collections agent
+          </h1>
+          <p class="mt-2 text-sm sm:text-base text-slate-400 max-w-3xl">
+            Every action below is signed by the agent, gated by a policy engine, and sealed in a
+            hash-chained audit log. Verifiable offline. Exportable as a signed Compliance Bundle.
+          </p>
+        </div>
+        <div class="flex gap-2 flex-shrink-0">
+          <button onclick="resetDemo()" class="px-3 py-2 text-sm font-medium rounded-lg border border-slate-700 hover:bg-slate-800 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0114-5l2 2M20 14a8 8 0 01-14 5l-2-2"/></svg>
+            Reset demo
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI strip -->
+      <div class="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="border border-slate-800 rounded-xl bg-slate-900/40 p-4">
+          <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">Agent ID</div>
+          <div class="mt-1 text-sm font-mono text-slate-200 truncate" title="{{ bundle.agent_id }}">{{ bundle.agent_id }}</div>
+        </div>
+        <div class="border border-slate-800 rounded-xl bg-slate-900/40 p-4">
+          <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">Responsible principal</div>
+          <div class="mt-1 text-sm text-slate-200 truncate">{{ bundle.human_principal }}</div>
+        </div>
+        <div class="border border-slate-800 rounded-xl bg-slate-900/40 p-4">
+          <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">Audit entries</div>
+          <div class="mt-1 text-2xl font-bold text-brand-400 font-mono" id="kpi-entries">—</div>
+        </div>
+        <div class="border border-slate-800 rounded-xl bg-slate-900/40 p-4">
+          <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">Chain integrity</div>
+          <div class="mt-1 text-2xl font-bold text-emerald-400 font-mono" id="kpi-integrity">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN GRID ──────────────────────────────────────────── -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 grid lg:grid-cols-12 gap-6 flex-1">
+
+    <!-- LEFT: action panel -->
+    <section class="lg:col-span-5 space-y-4">
+
+      <!-- Scenarios -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800">
+          <h2 class="text-sm font-semibold tracking-tight">One-click scenarios</h2>
+          <p class="mt-1 text-xs text-slate-400">Pre-baked sequences that exercise the policy gate.</p>
+        </div>
+        <div class="divide-y divide-slate-800">
+          <button onclick="runScenario('low_risk')" class="w-full px-5 py-4 hover:bg-slate-800/40 transition text-left flex items-start gap-3 group">
+            <span class="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-xs font-mono font-bold">1</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Low-risk plan · Mariana Soto</div>
+              <div class="text-xs text-slate-400 mt-0.5">Look up customer · 5% discount on USD 1,840.50 · email confirmation</div>
+              <div class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400">expected: 3 ALLOW</div>
+            </div>
+            <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <button onclick="runScenario('high_risk')" class="w-full px-5 py-4 hover:bg-slate-800/40 transition text-left flex items-start gap-3 group">
+            <span class="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center text-xs font-mono font-bold">2</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Aggressive discount · Joaquín Bermúdez</div>
+              <div class="text-xs text-slate-400 mt-0.5">25% discount on USD 7,420.10 · violates Risk Policy 4.2</div>
+              <div class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-mono text-amber-400">expected: 1 DENY (rule "Block aggressive discounts")</div>
+            </div>
+            <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <button onclick="runScenario('restricted_channel')" class="w-full px-5 py-4 hover:bg-slate-800/40 transition text-left flex items-start gap-3 group">
+            <span class="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-xs font-mono font-bold">3</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">Restricted channel · Renata Falcão</div>
+              <div class="text-xs text-slate-400 mt-0.5">Plan approved · phone confirmation blocked by policy</div>
+              <div class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-mono text-rose-400">expected: 1 DENY (channel restriction)</div>
+            </div>
+            <svg class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Compliance actions -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800">
+          <h2 class="text-sm font-semibold tracking-tight">Compliance surface</h2>
+          <p class="mt-1 text-xs text-slate-400">What an external auditor would see.</p>
+        </div>
+        <div class="p-5 space-y-3">
+          <button onclick="verifyChain()" class="w-full px-4 py-3 rounded-lg border border-slate-700 hover:border-brand-500 hover:bg-brand-500/5 transition text-left flex items-center justify-between gap-3 group">
+            <div>
+              <div class="text-sm font-semibold">Verify chain integrity</div>
+              <div class="text-xs text-slate-400 mt-0.5">Recompute every hash · validate prev_hash linkage · check sealed roots</div>
+            </div>
+            <span class="text-xs font-mono text-brand-400 group-hover:text-brand-300">→</span>
+          </button>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="exportBundle('eu_ai_act')" class="px-3 py-3 rounded-lg border border-slate-700 hover:border-brand-500 hover:bg-brand-500/5 transition text-left">
+              <div class="text-xs font-semibold">Export bundle</div>
+              <div class="text-[10px] text-slate-400 mt-0.5 font-mono">EU AI Act mapping</div>
+            </button>
+            <button onclick="exportBundle('nist_ai_rmf')" class="px-3 py-3 rounded-lg border border-slate-700 hover:border-brand-500 hover:bg-brand-500/5 transition text-left">
+              <div class="text-xs font-semibold">Export bundle</div>
+              <div class="text-[10px] text-slate-400 mt-0.5 font-mono">NIST AI RMF mapping</div>
+            </button>
+          </div>
+          <div id="bundle-result" class="text-xs"></div>
+          <div id="verify-result" class="text-xs"></div>
+        </div>
+      </div>
+
+      <!-- Public key card -->
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800">
+          <h2 class="text-sm font-semibold tracking-tight">Citizenship Bundle</h2>
+        </div>
+        <div class="p-5 space-y-3 text-xs">
+          <div>
+            <div class="text-slate-500 uppercase tracking-wider font-medium">agent_name</div>
+            <div class="mt-0.5 text-slate-200">{{ bundle.agent_name }}</div>
+          </div>
+          <div>
+            <div class="text-slate-500 uppercase tracking-wider font-medium">public_key_b64</div>
+            <div class="mt-0.5 font-mono text-slate-300 break-all">{{ bundle.public_key_b64 }}</div>
+          </div>
+          <div>
+            <div class="text-slate-500 uppercase tracking-wider font-medium">created_at</div>
+            <div class="mt-0.5 font-mono text-slate-300">{{ bundle.created_at }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: live audit log -->
+    <section class="lg:col-span-7">
+      <div class="border border-slate-800 rounded-xl bg-slate-900/40 overflow-hidden h-full flex flex-col">
+        <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-semibold tracking-tight flex items-center gap-2">
+              Tamper-evident audit chain
+              <span id="sse-status" class="inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                live
+              </span>
+            </h2>
+            <p class="mt-1 text-xs text-slate-400">DCP-03 hash-chained log · SHA-256 + SHA3-256 dual roots · sealed signatures</p>
+          </div>
+          <button onclick="refreshAudit()" class="text-xs px-2.5 py-1.5 rounded-md border border-slate-700 hover:bg-slate-800 transition">
+            Refresh
+          </button>
+        </div>
+        <div id="audit-log" class="flex-1 overflow-y-auto px-2 py-2 space-y-1.5 max-h-[820px]">
+          <div class="text-center py-12 text-slate-500 text-sm" id="audit-empty-state">
+            Audit log is empty. Run a scenario to see live entries.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="border-t border-slate-800 bg-slate-900/40 mt-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        Open source · Apache 2.0 · Built on
+        <a href="https://github.com/dcp-ai-protocol/agno-dcp" class="text-brand-400 hover:text-brand-300 underline" target="_blank" rel="noopener">agno-dcp</a>
+        +
+        <a href="https://www.agno.com/" class="text-brand-400 hover:text-brand-300 underline" target="_blank" rel="noopener">Agno</a>
+      </div>
+      <div class="flex gap-4">
+        <a href="https://github.com/dcp-ai-protocol/agno-dcp-demo" class="hover:text-slate-200 transition" target="_blank" rel="noopener">Source code</a>
+        <a href="https://docs.dcp-ai.org/quickstart/QUICKSTART_AGNO/" class="hover:text-slate-200 transition" target="_blank" rel="noopener">Docs</a>
+        <a href="/api/docs" class="hover:text-slate-200 transition">API</a>
+      </div>
+    </div>
+  </footer>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/app.js"></script>
+{% endblock %}

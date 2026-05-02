@@ -1,0 +1,39 @@
+/* Subtle scrollbar styling for the audit log column */
+#audit-log::-webkit-scrollbar { width: 8px; }
+#audit-log::-webkit-scrollbar-track { background: transparent; }
+#audit-log::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+}
+#audit-log::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
+}
+
+/* Pulse animation for newly-arrived entries */
+@keyframes audit-pulse {
+  0% { background-color: rgba(6, 182, 212, 0.18); border-color: rgba(6, 182, 212, 0.55); }
+  100% { background-color: transparent; }
+}
+.audit-entry-new {
+  animation: audit-pulse 1.6s ease-out;
+}
+
+/* Code block contrast */
+pre.audit-payload {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: rgb(203 213 225);
+}
+
+/* Smooth font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hide horizontal scrollbar artefacts on mobile */
+html, body { overflow-x: hidden; }

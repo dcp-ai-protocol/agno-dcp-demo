@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{{ settings.demo_title }}{% endblock %}</title>
+  <meta name="description" content="End-to-end demo of agno-dcp: cryptographic governance for Agno agents. Identity, signed policy gating, tamper-evident audit, and offline-verifiable Compliance Bundles." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="{{ settings.demo_title }}" />
+  <meta property="og:description" content="Banking-grade cryptographic governance for AI agents. Live demo of identity, policy gating, and tamper-evident audit." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2306b6d4'/%3E%3Cpath d='M30 30h40v40H30z' fill='none' stroke='%23fff' stroke-width='8'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.3" crossorigin="anonymous"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfeff', 100: '#cffafe', 200: '#a5f3fc', 300: '#67e8f9',
+              400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490',
+              800: '#155e75', 900: '#164e63', 950: '#083344',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="font-sans antialiased min-h-full">
+  {% block content %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

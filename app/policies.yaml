@@ -1,0 +1,62 @@
+version: "1.0"
+
+# Default-deny posture: any tool not whitelisted below is blocked.
+# This is the conservative starting point recommended by every banking
+# compliance team we've talked to.
+default: deny
+
+rules:
+
+  # ── Read operations ────────────────────────────────────────────
+  - name: "Customer lookups always allowed"
+    when:
+      action_type: tool_call
+      tool_name: lookup_customer
+    then: allow
+
+  # ── Payment plan proposals ────────────────────────────────────
+  - name: "Block aggressive discounts (over 20% requires human approval)"
+    when:
+      action_type: tool_call
+      tool_name: propose_payment_plan
+      payload.discount_pct:
+        gt: 20
+    then: deny
+    reason: "Discounts above 20% require human approval per Risk Policy 4.2."
+
+  - name: "Block large outstanding balances without escalation"
+    when:
+      action_type: tool_call
+      tool_name: propose_payment_plan
+      payload.total_amount_usd:
+        gt: 5000
+    then: deny
+    reason: "Plans above USD 5,000 require Tier-3 risk officer cosign."
+
+  - name: "Allow conservative payment plans"
+    when:
+      action_type: tool_call
+      tool_name: propose_payment_plan
+    then: allow
+
+  # ── Callbacks ─────────────────────────────────────────────────
+  - name: "Allow scheduling callbacks"
+    when:
+      action_type: tool_call
+      tool_name: schedule_callback
+    then: allow
+
+  # ── Outbound communications ───────────────────────────────────
+  - name: "Block confirmations to phone channel (regulated callback only)"
+    when:
+      action_type: tool_call
+      tool_name: send_confirmation
+      payload.channel: phone
+    then: deny
+    reason: "Phone communications must originate from a registered agent line."
+
+  - name: "Allow email/SMS confirmations"
+    when:
+      action_type: tool_call
+      tool_name: send_confirmation
+    then: allow

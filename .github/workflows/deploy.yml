@@ -1,0 +1,35 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Use the FLY_API_TOKEN repository secret. Configure it once with:
+#   fly tokens create deploy
+# then add the value at: Settings → Secrets → Actions → FLY_API_TOKEN
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy to fly.io
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://demo.dcp-ai.org
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: flyctl deploy --config fly/fly.toml --remote-only --strategy immediate
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -1,0 +1,21 @@
+services:
+  agno-dcp-demo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: agno-dcp-demo:dev
+    container_name: agno-dcp-demo
+    ports:
+      - "8000:8000"
+    environment:
+      - DEMO_BANK_NAME=${DEMO_BANK_NAME:-Demo Trust Bank}
+      - DEMO_HUMAN_PRINCIPAL=${DEMO_HUMAN_PRINCIPAL:-ops@demo-trust-bank.example}
+      - LLM_PROVIDER=${LLM_PROVIDER:-mock}
+      - APP_LOG_LEVEL=${APP_LOG_LEVEL:-INFO}
+    volumes:
+      # Persistent agent state (audit chain, identity, exported bundles)
+      - agno-dcp-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  agno-dcp-data:
