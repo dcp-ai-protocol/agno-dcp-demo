@@ -252,6 +252,20 @@ agno-dcp-demo/
 
 ---
 
+## DCP-AI ecosystem
+
+This demo is one of three coordinated repositories. Pick the entry point that matches your role:
+
+| Repo | Audience | Purpose |
+|---|---|---|
+| [`dcp-ai-protocol/dcp-ai`](https://github.com/dcp-ai-protocol/dcp-ai) | Protocol implementers | Reference protocol, JSON schemas, 5 SDKs (TypeScript, Python, Go, Rust, WASM), CLI, conformance harness |
+| [`dcp-ai-protocol/agno-dcp`](https://github.com/dcp-ai-protocol/agno-dcp) | Python developers using Agno | Library that wraps Agno `Agent` / `Team` / `Workflow` / MCP primitives with DCP-AI governance |
+| **`dcp-ai-protocol/agno-dcp-demo`** *(this repo)* | Regulated buyers, auditors | End-to-end banking demo: signed identity, gated tool calls, sealed audit log, signed Compliance Bundle |
+
+Protocol spec, quickstarts, and compliance mappings live at [docs.dcp-ai.org](https://docs.dcp-ai.org). Project home page: [dcp-ai.org](https://dcp-ai.org).
+
+---
+
 ## License and acknowledgments
 
 Released under the [Apache License 2.0](LICENSE).
